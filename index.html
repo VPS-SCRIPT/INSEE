@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work & Fuel Tracker</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(23, 32, 53, 0.75);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --danger: #ff4b5c;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, #16223f, var(--bg-color) 60%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px 15px 60px;
+    }
+
+    .container {
+      max-width: 750px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 12px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      background: #111827;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.4px;
+    }
+
+    /* Icon helper */
+    .icon-inline {
+      width: 16px;
+      height: 16px;
+      vertical-align: -3px;
+      flex-shrink: 0;
+    }
+
+    .icon-tab {
+      width: 18px;
+      height: 18px;
+    }
+
+    .icon-btn {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Language Switcher */
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      color: #050811;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      color: #050811;
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+    }
+
+    /* Glass Card */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      margin-bottom: 15px;
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-with-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    input {
+      background: rgba(11, 15, 25, 0.85);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    select {
+      background: rgba(11, 15, 25, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      color: #050811;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    /* Monthly Summary Cards */
+    .monthly-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+      gap: 12px;
+    }
+
+    .month-box {
+      background: rgba(11, 15, 25, 0.65);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .month-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+    }
+
+    .month-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      font-size: 0.95rem;
+    }
+
+    .btn-del-month {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 75, 92, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 75, 92, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-del-month:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .stat-val {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Table */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .th-inner {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-del-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: 1px solid rgba(255, 75, 92, 0.4);
+      color: var(--danger);
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: 0.2s;
+    }
+
+    .btn-del-row:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .loader {
+      text-align: center;
+      padding: 20px;
+      color: var(--accent-cyan);
+      font-size: 0.9rem;
+    }
+
+    /* Custom Glassmorphic Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 17, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: linear-gradient(145deg, rgba(26, 36, 60, 0.95), rgba(13, 19, 33, 0.98));
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 242, 254, 0.1);
+      transform: scale(0.92) translateY(10px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+    }
+
+    .modal-overlay.show .modal-box {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-icon {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 242, 254, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+    }
+
+    .modal-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .modal-icon.danger {
+      background: rgba(255, 75, 92, 0.12);
+      color: var(--danger);
+      border-color: rgba(255, 75, 92, 0.3);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .modal-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      line-height: 1.45;
+    }
+
+    .modal-input {
+      width: 100%;
+      margin-bottom: 12px;
+      text-align: center;
+      letter-spacing: 2px;
+      font-size: 1.05rem;
+    }
+
+    .remember-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-wrap input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px;
+      border-radius: 11px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .modal-btn.cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .modal-btn.cancel:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .modal-btn.confirm {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      color: #050811;
+    }
+
+    .modal-btn.confirm.danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-clear-pass {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-clear-pass:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="brand-wrap">
+      <img
+        src="https://s7d2.scene7.com/is/image/Caterpillar/CM20210226-732e7-c35a9"
+        alt="Site Logo"
+        class="brand-logo"
+        onerror="this.src='https://placehold.co/88x88/111827/00f2fe?text=CAT'"
+      />
+      <h1 data-i18n="appTitle">ระบบบันทึกข้อมูลงาน</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-clear-pass hidden" id="btn-logout" onclick="clearSavedPassword()" title="Lock / Clear Password">
+        <i data-lucide="lock" class="icon-btn"></i>
+      </button>
+      <div class="lang-switch">
+        <i data-lucide="globe" class="icon-btn" style="color:var(--text-muted);margin-left:6px;"></i>
+        <button class="lang-btn active" id="lang-th" onclick="setLanguage('th')">TH</button>
+        <button class="lang-btn" id="lang-en" onclick="setLanguage('en')">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-queue" onclick="switchTab('queue')">
+      <i data-lucide="truck" class="icon-tab"></i>
+      <span data-i18n="tabQueue">ยอดคิว</span>
+    </button>
+    <button class="tab-btn" id="tab-fuel" onclick="switchTab('fuel')">
+      <i data-lucide="fuel" class="icon-tab"></i>
+      <span data-i18n="tabFuel">ยอดน้ำมัน</span>
+    </button>
+  </div>
+
+  <!-- ================= TAB 1: ยอดคิว / Queue ================= -->
+  <div id="section-queue">
+    <div class="card">
+      <div class="card-title">
+        <span class="title-with-icon">
+          <i data-lucide="plus-circle" class="icon-inline"></i>
+          <span data-i18n="addQueueTitle">บันทึก ยอดคิว ใหม่</span>
+        </span>
+      </div>
+      <form id="form-queue" class="form-grid" onsubmit="addRecord(event, 'queue')">
+        <div class="input-group">
+          <label><i data-lucide="calendar" class="icon-btn"></i> <span data-i18n="labelDate">วันที่ (Date)</span></label>
+          <input type="date" id="q-date" required />
+        </div>
+        <div class="input-group">
+          <label><i data-lucide="box" class="icon-btn"></i> <span data-i18n="labelQueueAmount">ยอดคิว (คิว)</span></label>
+          <input type="number" step="0.01" id="q-amount" placeholder="0.00" required />
+        </div>
+        <div class="input-group">
+          <label><i data-lucide="map-pin" class="icon-btn"></i> <span data-i18n="labelLocation">สถานที่</span></label>
+          <input type="text" id="q-location" data-i18n-placeholder="phLocation" placeholder="ระบุสถานที่..." required />
+        </div>
+        <button type="submit" class="btn-submit" id="btn-submit-queue">
+          <i data-lucide="save" class="icon-tab"></i>
+          <span data-i18n="btnSave">บันทึกข้อมูล</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="title-with-icon">
+          <i data-lucide="bar-chart-3" class="icon-inline"></i>
+          <span data-i18n="monthlyQueueTitle">สรุปยอดคิวรายเดือน</span>
+        </span>
+        <select id="filter-month-queue" onchange="onMonthFilterChange('queue')"></select>
+      </div>
+      <div id="monthly-queue" class="monthly-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="title-with-icon">
+          <i data-lucide="list" class="icon-inline"></i>
+          <span data-i18n="allRecordsTitle">รายการทั้งหมด</span>
+        </span>
+        <span id="filter-badge-queue" style="font-size:0.82rem;color:var(--text-muted);"></span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th><span class="th-inner"><i data-lucide="calendar" class="icon-btn"></i> <span data-i18n="thDate">วันที่</span></span></th>
+              <th><span class="th-inner"><i data-lucide="box" class="icon-btn"></i> <span data-i18n="thQueue">ยอดคิว</span></span></th>
+              <th><span class="th-inner"><i data-lucide="map-pin" class="icon-btn"></i> <span data-i18n="thLocation">สถานที่</span></span></th>
+              <th><span class="th-inner"><i data-lucide="settings-2" class="icon-btn"></i> <span data-i18n="thAction">จัดการ</span></span></th>
+            </tr>
+          </thead>
+          <tbody id="list-queue"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TAB 2: ยอดน้ำมัน / Fuel ================= -->
+  <div id="section-fuel" class="hidden">
+    <div class="card">
+      <div class="card-title">
+        <span class="title-with-icon">
+          <i data-lucide="plus-circle" class="icon-inline"></i>
+          <span data-i18n="addFuelTitle">บันทึก ยอดน้ำมัน ใหม่</span>
+        </span>
+      </div>
+      <form id="form-fuel" class="form-grid" onsubmit="addRecord(event, 'fuel')">
+        <div class="input-group">
+          <label><i data-lucide="calendar" class="icon-btn"></i> <span data-i18n="labelDate">วันที่ (Date)</span></label>
+          <input type="date" id="f-date" required />
+        </div>
+        <div class="input-group">
+          <label><i data-lucide="droplet" class="icon-btn"></i> <span data-i18n="labelLiters">ลิตร (Liters)</span></label>
+          <input type="number" step="0.01" id="f-liters" placeholder="0.00" required />
+        </div>
+        <div class="input-group">
+          <label><i data-lucide="map-pin" class="icon-btn"></i> <span data-i18n="labelFuelLocation">สถานที่ / ปั๊มน้ำมัน</span></label>
+          <input type="text" id="f-location" data-i18n-placeholder="phFuelLocation" placeholder="ระบุสถานที่..." required />
+        </div>
+        <div class="input-group">
+          <label><i data-lucide="banknote" class="icon-btn"></i> <span data-i18n="labelPrice">ราคา (บาท)</span></label>
+          <input type="number" step="0.01" id="f-price" placeholder="0.00" required />
+        </div>
+        <button type="submit" class="btn-submit" id="btn-submit-fuel">
+          <i data-lucide="save" class="icon-tab"></i>
+          <span data-i18n="btnSave">บันทึกข้อมูล</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="title-with-icon">
+          <i data-lucide="bar-chart-3" class="icon-inline"></i>
+          <span data-i18n="monthlyFuelTitle">สรุปยอดน้ำมันรายเดือน</span>
+        </span>
+        <select id="filter-month-fuel" onchange="onMonthFilterChange('fuel')"></select>
+      </div>
+      <div id="monthly-fuel" class="monthly-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="title-with-icon">
+          <i data-lucide="list" class="icon-inline"></i>
+          <span data-i18n="allRecordsTitle">รายการทั้งหมด</span>
+        </span>
+        <span id="filter-badge-fuel" style="font-size:0.82rem;color:var(--text-muted);"></span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th><span class="th-inner"><i data-lucide="calendar" class="icon-btn"></i> <span data-i18n="thDate">วันที่</span></span></th>
+              <th><span class="th-inner"><i data-lucide="droplet" class="icon-btn"></i> <span data-i18n="thLiters">ลิตร</span></span></th>
+              <th><span class="th-inner"><i data-lucide="map-pin" class="icon-btn"></i> <span data-i18n="thLocation">สถานที่</span></span></th>
+              <th><span class="th-inner"><i data-lucide="banknote" class="icon-btn"></i> <span data-i18n="thPrice">ราคา</span></span></th>
+              <th><span class="th-inner"><i data-lucide="settings-2" class="icon-btn"></i> <span data-i18n="thAction">จัดการ</span></span></th>
+            </tr>
+          </thead>
+          <tbody id="list-fuel"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Glassmorphic Pop-up Modal (No Website Name, SVG Icons) -->
+<div class="modal-overlay" id="custom-modal">
+  <div class="modal-box">
+    <div class="modal-icon" id="modal-icon"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-desc" id="modal-desc"></div>
+    <input type="password" class="modal-input hidden" id="modal-input" autocomplete="off" />
+    <label class="remember-wrap hidden" id="modal-remember-wrap">
+      <input type="checkbox" id="modal-remember" checked />
+      <span id="modal-remember-text"></span>
+    </label>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn cancel hidden" id="modal-cancel"></button>
+      <button type="button" class="modal-btn confirm" id="modal-confirm"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Cloudflare Worker URL
+  const API_URL = "https://insee.dchat810.workers.dev";
+
+  // Dictionary (TH & EN)
+  const translations = {
+    th: {
+      appTitle: "ระบบบันทึกข้อมูลงาน",
+      tabQueue: "ยอดคิว",
+      tabFuel: "ยอดน้ำมัน",
+      addQueueTitle: "บันทึก ยอดคิว ใหม่",
+      addFuelTitle: "บันทึก ยอดน้ำมัน ใหม่",
+      labelDate: "วันที่",
+      labelQueueAmount: "ยอดคิว (คิว)",
+      labelLocation: "สถานที่",
+      labelLiters: "ลิตร",
+      labelFuelLocation: "สถานที่ / ปั๊มน้ำมัน",
+      labelPrice: "ราคา (บาท)",
+      phLocation: "ระบุสถานที่...",
+      phFuelLocation: "ระบุปั๊มหรือสถานที่...",
+      btnSave: "บันทึกข้อมูล",
+      btnSaving: "กำลังบันทึก...",
+      monthlyQueueTitle: "สรุปยอดคิวรายเดือน",
+      monthlyFuelTitle: "สรุปยอดน้ำมันรายเดือน",
+      allRecordsTitle: "รายการทั้งหมด",
+      filterAllMonths: "ทุกเดือน (ทั้งหมด)",
+      thDate: "วันที่",
+      thQueue: "ยอดคิว",
+      thLocation: "สถานที่",
+      thLiters: "ลิตร",
+      thPrice: "ราคา",
+      thAction: "จัดการ",
+      loading: "กำลังโหลดข้อมูล...",
+      calculating: "กำลังคำนวณ...",
+      connError: "เชื่อมต่อไม่สำเร็จ โปรดตรวจสอบการตั้งค่า",
+      noData: "ยังไม่มีข้อมูล",
+      noMonthlyData: "ไม่มีข้อมูลรายเดือน",
+      monthPrefix: "เดือน",
+      delMonth: "ลบทั้งเดือน",
+      delRow: "ลบ",
+      totalQueue: "รวมยอดคิว:",
+      unitQueue: "คิว",
+      totalTrips: "จำนวนเที่ยว:",
+      unitTrips: "รายการ",
+      totalLiters: "รวมลิตร:",
+      unitLiters: "ลิตร",
+      totalPrice: "รวมราคา:",
+      modalPassTitle: "ยืนยันรหัสผ่าน",
+      modalPassDesc: "กรุณากรอกรหัสผ่านเพื่อดำเนินการ",
+      modalPassPlaceholder: "รหัสผ่าน...",
+      modalRemember: "จำรหัสผ่านไว้ (ไม่ต้องกรอกบ่อย)",
+      modalWrongPassTitle: "รหัสผ่านไม่ถูกต้อง",
+      modalWrongPassDesc: "รหัสผ่านไม่ตรงกับระบบ กรุณาลองใหม่อีกครั้ง",
+      modalDelRowTitle: "ยืนยันการลบข้อมูล",
+      modalDelRowDesc: "คุณต้องการลบรายการนี้ใช่หรือไม่? ข้อมูลที่ลบจะไม่สามารถกู้คืนได้",
+      modalDelMonthTitle: "ลบข้อมูลทั้งเดือน",
+      modalDelMonthDesc: "คุณต้องการลบข้อมูลทั้งหมดของเดือน {month} ใช่หรือไม่?",
+      modalSuccessTitle: "สำเร็จ",
+      modalSavedDesc: "บันทึกข้อมูลเรียบร้อยแล้ว",
+      modalDeletedDesc: "ลบข้อมูลเรียบร้อยแล้ว",
+      modalLockedDesc: "ล้างรหัสผ่านที่บันทึกไว้เรียบร้อยแล้ว",
+      modalErrorTitle: "เกิดข้อผิดพลาด",
+      modalSaveErrorDesc: "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่",
+      btnConfirm: "ตกลง",
+      btnDelete: "ยืนยันการลบ",
+      btnCancel: "ยกเลิก"
+    },
+    en: {
+      appTitle: "Work & Fuel Tracker",
+      tabQueue: "Queue Records",
+      tabFuel: "Fuel Records",
+      addQueueTitle: "Add New Queue Record",
+      addFuelTitle: "Add New Fuel Record",
+      labelDate: "Date",
+      labelQueueAmount: "Queue (m³)",
+      labelLocation: "Location",
+      labelLiters: "Liters (L)",
+      labelFuelLocation: "Location / Station",
+      labelPrice: "Price (THB)",
+      phLocation: "Enter location...",
+      phFuelLocation: "Enter station or location...",
+      btnSave: "Save Record",
+      btnSaving: "Saving...",
+      monthlyQueueTitle: "Monthly Queue Summary",
+      monthlyFuelTitle: "Monthly Fuel Summary",
+      allRecordsTitle: "All Records",
+      filterAllMonths: "All Months",
+      thDate: "Date",
+      thQueue: "Queue",
+      thLocation: "Location",
+      thLiters: "Liters",
+      thPrice: "Price",
+      thAction: "Action",
+      loading: "Loading data...",
+      calculating: "Calculating...",
+      connError: "Connection failed. Please check configuration.",
+      noData: "No records found",
+      noMonthlyData: "No monthly summary available",
+      monthPrefix: "Month",
+      delMonth: "Delete Month",
+      delRow: "Delete",
+      totalQueue: "Total Queue:",
+      unitQueue: "m³",
+      totalTrips: "Total Trips:",
+      unitTrips: "trips",
+      totalLiters: "Total Liters:",
+      unitLiters: "L",
+      totalPrice: "Total Price:",
+      modalPassTitle: "Password Required",
+      modalPassDesc: "Please enter the admin password to continue.",
+      modalPassPlaceholder: "Password...",
+      modalRemember: "Remember password on this device",
+      modalWrongPassTitle: "Incorrect Password",
+      modalWrongPassDesc: "The password you entered is incorrect. Please try again.",
+      modalDelRowTitle: "Delete Record",
+      modalDelRowDesc: "Are you sure you want to delete this record? This action cannot be undone.",
+      modalDelMonthTitle: "Delete Entire Month",
+      modalDelMonthDesc: "Are you sure you want to delete all records for {month}?",
+      modalSuccessTitle: "Success",
+      modalSavedDesc: "Record saved successfully.",
+      modalDeletedDesc: "Deleted successfully.",
+      modalLockedDesc: "Saved password has been cleared.",
+      modalErrorTitle: "Error",
+      modalSaveErrorDesc: "Unable to save record. Please try again.",
+      btnConfirm: "Confirm",
+      btnDelete: "Delete",
+      btnCancel: "Cancel"
+    }
+  };
+
+  let currentLang = localStorage.getItem("app_lang") || "th";
+  let currentTab = "queue";
+  let cachedData = { queue: [], fuel: [] };
+  let selectedMonth = { queue: "ALL", fuel: "ALL" };
+
+  // Default Today Date
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("q-date").value = today;
+  document.getElementById("f-date").value = today;
+
+  function refreshIcons() {
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+
+  function updateLockButtonVisibility() {
+    const hasSaved = !!localStorage.getItem("admin_pass");
+    document.getElementById("btn-logout").classList.toggle("hidden", !hasSaved);
+  }
+
+  // Custom Modal Controller (Using Lucide SVG Icons, No Emoji, No Website Name)
+  function showModal({ iconName = "info", isDanger = false, title, desc, showInput = false, showRemember = false, showCancel = false, confirmText, cancelText }) {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById("custom-modal");
+      const iconEl = document.getElementById("modal-icon");
+      const titleEl = document.getElementById("modal-title");
+      const descEl = document.getElementById("modal-desc");
+      const inputEl = document.getElementById("modal-input");
+      const remWrap = document.getElementById("modal-remember-wrap");
+      const remCheck = document.getElementById("modal-remember");
+      const remText = document.getElementById("modal-remember-text");
+      const cancelBtn = document.getElementById("modal-cancel");
+      const confirmBtn = document.getElementById("modal-confirm");
+
+      const t = translations[currentLang];
+
+      iconEl.innerHTML = `<i data-lucide="${iconName}"></i>`;
+      iconEl.className = isDanger ? "modal-icon danger" : "modal-icon";
+      titleEl.textContent = title;
+      descEl.textContent = desc;
+
+      inputEl.value = "";
+      inputEl.placeholder = t.modalPassPlaceholder;
+      inputEl.classList.toggle("hidden", !showInput);
+
+      remText.textContent = t.modalRemember;
+      remCheck.checked = true;
+      remWrap.classList.toggle("hidden", !showRemember);
+
+      cancelBtn.innerHTML = `<i data-lucide="x" class="icon-btn"></i> <span>${cancelText || t.btnCancel}</span>`;
+      cancelBtn.classList.toggle("hidden", !showCancel);
+
+      const confirmIcon = isDanger ? "trash-2" : "check";
+      confirmBtn.innerHTML = `<i data-lucide="${confirmIcon}" class="icon-btn"></i> <span>${confirmText || t.btnConfirm}</span>`;
+      confirmBtn.className = isDanger ? "modal-btn confirm danger" : "modal-btn confirm";
+
+      refreshIcons();
+
+      overlay.classList.add("show");
+      if (showInput) setTimeout(() => inputEl.focus(), 80);
+
+      const cleanup = (result) => {
+        overlay.classList.remove("show");
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+        inputEl.onkeydown = null;
+        resolve(result);
+      };
+
+      confirmBtn.onclick = () => {
+        cleanup({
+          confirmed: true,
+          value: inputEl.value,
+          remember: remCheck.checked
+        });
+      };
+
+      cancelBtn.onclick = () => cleanup({ confirmed: false });
+
+      if (showInput) {
+        inputEl.onkeydown = (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            confirmBtn.click();
+          }
+        };
+      }
+    });
+  }
+
+  async function getAdminPassword(forcePrompt = false) {
+    const t = translations[currentLang];
+    const savedPass = localStorage.getItem("admin_pass");
+    if (!forcePrompt && savedPass) {
+      return savedPass;
+    }
+
+    const res = await showModal({
+      iconName: "key-round",
+      title: t.modalPassTitle,
+      desc: t.modalPassDesc,
+      showInput: true,
+      showRemember: true,
+      showCancel: true,
+      confirmText: t.btnConfirm
+    });
+
+    if (!res.confirmed || !res.value) return null;
+
+    if (res.remember) {
+      localStorage.setItem("admin_pass", res.value);
+    } else {
+      localStorage.removeItem("admin_pass");
+    }
+    updateLockButtonVisibility();
+    return res.value;
+  }
+
+  async function clearSavedPassword() {
+    const t = translations[currentLang];
+    localStorage.removeItem("admin_pass");
+    updateLockButtonVisibility();
+    await showModal({
+      iconName: "lock",
+      title: t.modalSuccessTitle,
+      desc: t.modalLockedDesc,
+      showCancel: false
+    });
+  }
+
+  function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem("app_lang", lang);
+
+    document.getElementById("lang-th").classList.toggle("active", lang === "th");
+    document.getElementById("lang-en").classList.toggle("active", lang === "en");
+
+    const t = translations[lang];
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (t[key]) el.textContent = t[key];
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-placeholder");
+      if (t[key]) el.placeholder = t[key];
+    });
+
+    renderData(currentTab, cachedData[currentTab]);
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById("tab-queue").classList.toggle("active", tab === "queue");
+    document.getElementById("tab-fuel").classList.toggle("active", tab === "fuel");
+    document.getElementById("section-queue").classList.toggle("hidden", tab !== "queue");
+    document.getElementById("section-fuel").classList.toggle("hidden", tab !== "fuel");
+    loadData(tab);
+  }
+
+  function onMonthFilterChange(type) {
+    const selectEl = document.getElementById(`filter-month-${type}`);
+    selectedMonth[type] = selectEl.value;
+    renderData(type, cachedData[type]);
+  }
+
+  async function loadData(type) {
+    const t = translations[currentLang];
+    const listEl = document.getElementById(`list-${type}`);
+    const monthlyEl = document.getElementById(`monthly-${type}`);
+    listEl.innerHTML = `<tr><td colspan="5" class="loader">${t.loading}</td></tr>`;
+    monthlyEl.innerHTML = `<div class="loader">${t.calculating}</div>`;
+
+    try {
+      const res = await fetch(`${API_URL}?type=${type}`);
+      const data = await res.json();
+      cachedData[type] = data;
+      renderData(type, data);
+    } catch (err) {
+      listEl.innerHTML = `<tr><td colspan="5" style="color:var(--danger);text-align:center;">${t.connError}</td></tr>`;
+      monthlyEl.innerHTML = "";
+    }
+  }
+
+  function renderData(type, data) {
+    const t = translations[currentLang];
+    const listEl = document.getElementById(`list-${type}`);
+    const monthlyEl = document.getElementById(`monthly-${type}`);
+    const selectEl = document.getElementById(`filter-month-${type}`);
+    const badgeEl = document.getElementById(`filter-badge-${type}`);
+
+    if (!data || !data.length) {
+      selectEl.innerHTML = `<option value="ALL">${t.filterAllMonths}</option>`;
+      badgeEl.textContent = "";
+      listEl.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">${t.noData}</td></tr>`;
+      monthlyEl.innerHTML = `<div style="color:var(--text-muted);font-size:0.9rem;">${t.noMonthlyData}</div>`;
+      refreshIcons();
+      return;
+    }
+
+    // Group all data by YYYY-MM
+    const monthlyMap = {};
+    data.forEach((item) => {
+      const monthKey = item.date.slice(0, 7);
+      if (!monthlyMap[monthKey]) {
+        monthlyMap[monthKey] = { totalQueue: 0, totalLiters: 0, totalPrice: 0, count: 0 };
+      }
+      monthlyMap[monthKey].count += 1;
+      if (type === "queue") {
+        monthlyMap[monthKey].totalQueue += parseFloat(item.amount || 0);
+      } else {
+        monthlyMap[monthKey].totalLiters += parseFloat(item.liters || 0);
+        monthlyMap[monthKey].totalPrice += parseFloat(item.price || 0);
+      }
+    });
+
+    const sortedMonths = Object.keys(monthlyMap).sort((a, b) => b.localeCompare(a));
+
+    // Populate Month Filter Dropdown
+    if (selectedMonth[type] !== "ALL" && !monthlyMap[selectedMonth[type]]) {
+      selectedMonth[type] = "ALL";
+    }
+    selectEl.innerHTML =
+      `<option value="ALL">${t.filterAllMonths}</option>` +
+      sortedMonths.map((m) => `<option value="${m}">${t.monthPrefix} ${m}</option>`).join("");
+    selectEl.value = selectedMonth[type];
+
+    // Filter months to display
+    const monthsToShow = selectedMonth[type] === "ALL" ? sortedMonths : [selectedMonth[type]];
+    badgeEl.textContent = selectedMonth[type] === "ALL" ? "" : `(${t.monthPrefix} ${selectedMonth[type]})`;
+
+    monthlyEl.innerHTML = monthsToShow
+      .map((month) => {
+        const m = monthlyMap[month];
+        const statsHtml =
+          type === "queue"
+            ? `<div class="stat-row"><span>${t.totalQueue}</span><span class="stat-val">${m.totalQueue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.unitQueue}</span></div>
+               <div class="stat-row"><span>${t.totalTrips}</span><span>${m.count} ${t.unitTrips}</span></div>`
+            : `<div class="stat-row"><span>${t.totalLiters}</span><span class="stat-val">${m.totalLiters.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${t.unitLiters}</span></div>
+               <div class="stat-row"><span>${t.totalPrice}</span><span class="stat-val" style="color:var(--accent-cyan);">${m.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ฿</span></div>`;
+
+        return `
+          <div class="month-box">
+            <div class="month-header">
+              <span class="month-name">
+                <i data-lucide="calendar-range" class="icon-btn"></i>
+                <span>${t.monthPrefix} ${month}</span>
+              </span>
+              <button class="btn-del-month" onclick="deleteMonth('${type}', '${month}')">
+                <i data-lucide="trash-2" style="width:12px;height:12px;"></i>
+                <span>${t.delMonth}</span>
+              </button>
+            </div>
+            ${statsHtml}
+          </div>
+        `;
+      })
+      .join("");
+
+    // Filter table rows by selected month
+    const filteredRows =
+      selectedMonth[type] === "ALL"
+        ? data
+        : data.filter((item) => item.date.startsWith(selectedMonth[type]));
+
+    listEl.innerHTML = filteredRows
+      .map((item) => {
+        if (type === "queue") {
+          return `
+            <tr>
+              <td>${item.date}</td>
+              <td style="font-weight:600;color:var(--accent-cyan);">${parseFloat(item.amount).toLocaleString()}</td>
+              <td>${escapeHtml(item.location)}</td>
+              <td>
+                <button class="btn-del-row" onclick="deleteItem('${type}', '${item.id}')">
+                  <i data-lucide="trash-2" style="width:13px;height:13px;"></i>
+                  <span>${t.delRow}</span>
+                </button>
+              </td>
+            </tr>
+          `;
+        } else {
+          return `
+            <tr>
+              <td>${item.date}</td>
+              <td>${parseFloat(item.liters).toLocaleString()}</td>
+              <td>${escapeHtml(item.location)}</td>
+              <td style="font-weight:600;color:var(--accent-cyan);">${parseFloat(item.price).toLocaleString()}</td>
+              <td>
+                <button class="btn-del-row" onclick="deleteItem('${type}', '${item.id}')">
+                  <i data-lucide="trash-2" style="width:13px;height:13px;"></i>
+                  <span>${t.delRow}</span>
+                </button>
+              </td>
+            </tr>
+          `;
+        }
+      })
+      .join("");
+
+    refreshIcons();
+  }
+
+  async function addRecord(e, type) {
+    e.preventDefault();
+    const t = translations[currentLang];
+
+    const password = await getAdminPassword(false);
+    if (!password) return;
+
+    const btn = e.target.querySelector("button[type='submit']");
+    const btnSpan = btn.querySelector("span");
+    btn.disabled = true;
+    btnSpan.textContent = t.btnSaving;
+
+    let payload = {};
+    if (type === "queue") {
+      payload = {
+        date: document.getElementById("q-date").value,
+        amount: parseFloat(document.getElementById("q-amount").value),
+        location: document.getElementById("q-location").value.trim(),
+      };
+    } else {
+      payload = {
+        date: document.getElementById("f-date").value,
+        liters: parseFloat(document.getElementById("f-liters").value),
+        location: document.getElementById("f-location").value.trim(),
+        price: parseFloat(document.getElementById("f-price").value),
+      };
+    }
+
+    try {
+      const response = await fetch(`${API_URL}?type=${type}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-Password": password
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem("admin_pass");
+        updateLockButtonVisibility();
+        await showModal({
+          iconName: "shield-alert",
+          isDanger: true,
+          title: t.modalWrongPassTitle,
+          desc: t.modalWrongPassDesc
+        });
+        return;
+      }
+
+      if (!response.ok) throw new Error("Save failed");
+
+      if (type === "queue") {
+        document.getElementById("q-amount").value = "";
+        document.getElementById("q-location").value = "";
+      } else {
+        document.getElementById("f-liters").value = "";
+        document.getElementById("f-location").value = "";
+        document.getElementById("f-price").value = "";
+      }
+
+      await loadData(type);
+      await showModal({
+        iconName: "check-circle-2",
+        title: t.modalSuccessTitle,
+        desc: t.modalSavedDesc
+      });
+    } catch (err) {
+      await showModal({
+        iconName: "alert-triangle",
+        isDanger: true,
+        title: t.modalErrorTitle,
+        desc: t.modalSaveErrorDesc
+      });
+    } finally {
+      btn.disabled = false;
+      btnSpan.textContent = t.btnSave;
+    }
+  }
+
+  async function deleteItem(type, id) {
+    const t = translations[currentLang];
+    const confirmRes = await showModal({
+      iconName: "trash-2",
+      isDanger: true,
+      title: t.modalDelRowTitle,
+      desc: t.modalDelRowDesc,
+      showCancel: true,
+      confirmText: t.btnDelete
+    });
+    if (!confirmRes.confirmed) return;
+
+    const password = await getAdminPassword(false);
+    if (!password) return;
+
+    const response = await fetch(`${API_URL}?type=${type}&id=${id}`, {
+      method: "DELETE",
+      headers: { "X-Admin-Password": password }
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("admin_pass");
+      updateLockButtonVisibility();
+      await showModal({
+        iconName: "shield-alert",
+        isDanger: true,
+        title: t.modalWrongPassTitle,
+        desc: t.modalWrongPassDesc
+      });
+      return;
+    }
+
+    await loadData(type);
+    await showModal({
+      iconName: "check-circle-2",
+      title: t.modalSuccessTitle,
+      desc: t.modalDeletedDesc
+    });
+  }
+
+  async function deleteMonth(type, month) {
+    const t = translations[currentLang];
+    const confirmRes = await showModal({
+      iconName: "trash-2",
+      isDanger: true,
+      title: t.modalDelMonthTitle,
+      desc: t.modalDelMonthDesc.replace("{month}", month),
+      showCancel: true,
+      confirmText: t.btnDelete
+    });
+    if (!confirmRes.confirmed) return;
+
+    const password = await getAdminPassword(false);
+    if (!password) return;
+
+    const response = await fetch(`${API_URL}?type=${type}&month=${month}`, {
+      method: "DELETE",
+      headers: { "X-Admin-Password": password }
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("admin_pass");
+      updateLockButtonVisibility();
+      await showModal({
+        iconName: "shield-alert",
+        isDanger: true,
+        title: t.modalWrongPassTitle,
+        desc: t.modalWrongPassDesc
+      });
+      return;
+    }
+
+    await loadData(type);
+    await showModal({
+      iconName: "check-circle-2",
+      title: t.modalSuccessTitle,
+      desc: t.modalDeletedDesc
+    });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+  }
+
+  // Initialize
+  refreshIcons();
+  updateLockButtonVisibility();
+  setLanguage(currentLang);
+  loadData("queue");
+</script>
+
+</body>
+</html>
